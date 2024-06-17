@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import UserModel from '../models/UserModel';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet } from "react-native";
+import defaultStyle from '../styles/DefaultStyles';
 
 
 const LoginScreen: React.FC = () => {
@@ -17,6 +18,7 @@ const LoginScreen: React.FC = () => {
   function handleRegister() {
     navigator.navigate('Register');
   }
+
   function handleLogin(): void {
   
     setValidLogin(validateUser());
@@ -60,20 +62,20 @@ const LoginScreen: React.FC = () => {
   }
 
   return (  
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Freelancer App</Text>
-      <TextInput value={user.email} style={styles.input} placeholder="Usuário" placeholderTextColor="#333" onChangeText={(email: string) => setUser({...user, email: email})}/>
-      <TextInput value={user.password} style={styles.input} placeholder="Senha" placeholderTextColor="#333" onChangeText={(password) => setUser({...user, password: password})} />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+    <SafeAreaView style={defaultStyle.containerDefault}>
+      <Text style={defaultStyle.title}>Freelancer App</Text>
+      <TextInput value={user.email} style={defaultStyle.input} placeholder="Usuário" placeholderTextColor="#333" onChangeText={(email: string) => setUser({...user, email: email})}/>
+      <TextInput value={user.password} style={defaultStyle.input} placeholder="Senha" placeholderTextColor="#333" onChangeText={(password) => setUser({...user, password: password})} />
+      <TouchableOpacity style={defaultStyle.button} onPress={handleLogin}>
+        <Text style={defaultStyle.buttonText}>Login</Text>
       </TouchableOpacity>
       <View style={styles.separatorContainer}>
         <View style={styles.separator} />
         <Text style={styles.separatorText}>Ou</Text>
         <View style={styles.separator} />
       </View>
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-        <Text style={styles.registerButtonText}>Criar Nova Conta</Text>
+      <TouchableOpacity style={defaultStyle.button} onPress={handleRegister}>
+        <Text style={defaultStyle.buttonText}>Criar Nova Conta</Text>
       </TouchableOpacity>
           {!validLogin && (
           <View style={styles.validationMessageContainer}>
@@ -86,38 +88,6 @@ const LoginScreen: React.FC = () => {
 
 
 const styles =  StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#002A3A',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 32,
-    color: '#fff',
-    marginBottom: 40,
-  },
-  input: {
-    width: '100%',
-    backgroundColor: '#E5D3A1',
-    padding: 15,
-    borderRadius: 5,
-    marginBottom: 20,
-    fontSize: 16,
-    color: '#333',
-  },
-  button: {
-    width: '100%',
-    backgroundColor: '#C30000',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center'
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-  },
   separatorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -131,17 +101,6 @@ const styles =  StyleSheet.create({
   separatorText: {
     marginHorizontal: 10,
     color: '#fff',
-  },
-  registerButton: {
-    width: '100%',
-    backgroundColor: '#C30000',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  registerButtonText: {
-    color: '#fff',
-    fontSize: 18,
   },
   validationMessageContainer: {
     width: '100%',
