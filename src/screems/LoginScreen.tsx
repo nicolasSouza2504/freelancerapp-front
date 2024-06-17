@@ -5,6 +5,7 @@ import UserModel from '../models/UserModel';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet } from "react-native";
 import defaultStyle from '../styles/DefaultStyles';
+import LoginService from '../services/LoginService';
 
 
 const LoginScreen: React.FC = () => {
@@ -19,12 +20,22 @@ const LoginScreen: React.FC = () => {
     navigator.navigate('Register');
   }
 
-  function handleLogin(): void {
+  async function handleLogin(): Promise<void> {
   
     setValidLogin(validateUser());
     
     if (validLogin) {
-      console.log("Login")
+      
+      try {
+        
+        const response = LoginService.login(user);
+
+        console.log('LOGED IN => ', JSON.stringify(response))
+      
+      } catch (error) {
+        console.log('ERROR LOGIN => ', JSON.stringify(error))
+      }
+
     }
 
   }
