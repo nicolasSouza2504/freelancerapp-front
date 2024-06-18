@@ -6,13 +6,13 @@ import { useNavigation } from '@react-navigation/native';
 import { StyleSheet } from "react-native";
 import defaultStyle from '../styles/DefaultStyles';
 import LoginService from '../services/LoginService';
-
+import ResponseModel from '../models/ResponseModel';
 
 const LoginScreen: React.FC = () => {
   
   const [user, setUser] = useState<UserModel>({email: '', password: '' });
   const [validLogin, setValidLogin] = useState(true);
-  const [textError, setErrorText] = useState('');
+  const [textError, setTextError] = useState('');
 
   const navigator = useNavigation();
 
@@ -22,7 +22,7 @@ const LoginScreen: React.FC = () => {
 
   async function handleLogin(): Promise<void> {
   
-    setValidLogin(validateUser());
+    validateUser();
     
     if (validLogin) {
       
@@ -30,10 +30,12 @@ const LoginScreen: React.FC = () => {
         
         const response = LoginService.login(user);
 
-        console.log('LOGED IN => ', JSON.stringify(response))
+        console.log('LOGED IN => ', JSON.stringify((await response).data))
       
-      } catch (error) {
-        console.log('ERROR LOGIN => ', JSON.stringify(error))
+      } catch (error) {        
+        
+        throwError(new ResponseModel(error.response.data).message);
+
       }
 
     }
@@ -62,7 +64,7 @@ const LoginScreen: React.FC = () => {
 
   function throwError(errorMessage:string): void {
     
-    setErrorText(errorMessage);
+    setTextError(errorMessage);
   
     setValidLogin(false);
 
