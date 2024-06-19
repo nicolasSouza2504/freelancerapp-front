@@ -5,8 +5,8 @@ import { AxiosResponse } from "axios";
 
 export default {
     
-    login: async (user: UserModel): Promise<AxiosResponse> => {
-        return ServiceApi.post('/login', user);
+    register: async (user: UserModel): Promise<AxiosResponse> => {
+        return ServiceApi.post('/register', user);
     } 
 
 }
