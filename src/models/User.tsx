@@ -5,4 +5,5 @@ export default interface User {
     confirmedPassword?: string;
     userName?: string;
     cpfCnpj?: string;
+    id?: string;
   }

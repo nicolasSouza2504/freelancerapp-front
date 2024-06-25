@@ -33,7 +33,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
 
   async (response: AxiosResponse): Promise<AxiosResponse> => {
-    return response.data;
+    return response;
   },
   (error) => {
 

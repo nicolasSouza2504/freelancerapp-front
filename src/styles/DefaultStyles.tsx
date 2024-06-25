@@ -27,12 +27,18 @@ const defaultStyle = StyleSheet.create({
         backgroundColor: '#002A3A',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        padding: 20
     },
     title: {
         fontSize: 32,
         color: '#fff',
         marginBottom: 40,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        gap: 25,
+        marginBottom: 20,
     }
 });
 

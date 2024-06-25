@@ -8,6 +8,7 @@ import defaultStyle from '../styles/DefaultStyles';
 import LoginService from '../services/LoginService';
 import Response from '../models/Response';
 import ValidationContainer from '../components/ValidationContainer'
+import { isSession } from '../models/Session';
 
 const LoginScreen: React.FC = () => {
   
@@ -18,7 +19,7 @@ const LoginScreen: React.FC = () => {
   const navigator = useNavigation();
 
   function handleRegister() {
-    navigator.navigate('Register');
+    navigator.navigate('Register' as never);
   }
 
   async function handleLogin(): Promise<void> {
@@ -31,6 +32,10 @@ const LoginScreen: React.FC = () => {
   
         const response = await LoginService.login(user);
       
+        if (isSession(response.data)) {
+          navigator.navigate("Menu" as never)
+        }
+        
       } catch (error) {      
       
         let response: Response[] = error.response.data;
