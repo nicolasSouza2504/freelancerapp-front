@@ -1,6 +1,7 @@
 export default interface Contratante {
   id: number;
   name: string;
-  cnpj: string;
-  color: string;
+  cpfCnpj: string;
+  hexColor: string;
+  userLoginId: string;
 }

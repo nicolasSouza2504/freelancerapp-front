@@ -27,7 +27,9 @@ const defaultStyle = StyleSheet.create({
         backgroundColor: '#002A3A',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20
+        padding: 20,
+        height: '100%',
+        width: '100%'
     },
     title: {
         fontSize: 32,
@@ -39,7 +41,17 @@ const defaultStyle = StyleSheet.create({
         justifyContent: 'space-around',
         gap: 25,
         marginBottom: 20,
-    }
+    },
+    homeIcon: {
+        position: 'absolute',
+        top: 16,
+        left: 16,
+    },
+    icon: {
+        width: 24,
+        height: 24,
+    },
+
 });
 
 export default defaultStyle;

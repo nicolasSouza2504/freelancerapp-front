@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import {API_BASE_URL} from '../constants/Constants'
+import { API_BASE_URL } from '../constants/Constants'
 import StorageService from './StorageService';
 
 const baseURL = API_BASE_URL
@@ -11,16 +11,14 @@ const axiosInstance: AxiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(
-  
+
   async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
 
-    const authToken = StorageService.getItem("auth-token");
+    const authToken = await StorageService.getItem("auth-token");
 
     if (authToken) {
-      config.headers['Cookie'] = config.headers['Cookie'] + authToken;
+      config.headers['Cookie'] = 'authToken=' + authToken + ";"
     }
-
-    console.log('Request sent at: ', new Date().toISOString());
 
     return config;
 

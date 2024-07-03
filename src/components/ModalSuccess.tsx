@@ -3,44 +3,44 @@ import React from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ModalSuccessProps {
-    successMessageVisible: boolean;
-    setSuccessMessageVisible: (bol: boolean) => void;
-    successMessage: string;
-    redirect: boolean;
-    redirectPath: string;
+  successMessageVisible: boolean;
+  setSuccessMessageVisible: (bol: boolean) => void;
+  successMessage: string;
+  redirect: boolean;
+  redirectPath: string;
 }
 
 
-const ModalSuccessContainer: React.FC<ModalSuccessProps> =({successMessage, setSuccessMessageVisible, successMessageVisible, redirect, redirectPath}) => {
+const ModalSuccessContainer: React.FC<ModalSuccessProps> = ({ successMessage, setSuccessMessageVisible, successMessageVisible, redirect, redirectPath }) => {
 
-    const navigator = useNavigation();
+  const navigator = useNavigation();
 
-    return (<Modal
-          animationType="slide"
-          transparent={true}
-          visible={successMessageVisible}
-          onRequestClose={() => setSuccessMessageVisible(false)}
+  return (<Modal
+    animationType="slide"
+    transparent={true}
+    visible={successMessageVisible}
+    onRequestClose={() => setSuccessMessageVisible(false)}
+  >
+    <View style={styles.modalContainer}>
+      <View style={styles.modalView}>
+        <Text style={styles.modalText}>{successMessage}</Text>
+        <TouchableOpacity
+          style={[styles.button, styles.buttonClose]}
+          onPress={() => {
+
+            setSuccessMessageVisible(false);
+
+            if (redirect && redirectPath) {
+              navigator.navigate(redirectPath);
+            }
+
+          }}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>{successMessage}</Text>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => {
-                  
-                  setSuccessMessageVisible(false);
-
-                  if (redirect && redirectPath) {
-                    navigator.navigate(redirectPath);
-                  }
-
-                }}
-              >
-                <Text style={styles.textStyle}>OK</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>)
+          <Text style={styles.textStyle}>OK</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </Modal>)
 
 }
 
