@@ -1,7 +1,7 @@
 import React from "react";
 import ServiceApi from './ServiceApi'
-import UserModel from "../models/User";
 import { AxiosResponse } from "axios";
+import Hirer from "../models/Hirer";
 
 
 export default {
@@ -10,6 +10,13 @@ export default {
 
         return await ServiceApi.get('/hirer');
 
+    },
+
+    save: async (hirer: Hirer): Promise<AxiosResponse> => {
+
+        return await ServiceApi.post('/hirer', hirer);
+
     }
+
 
 }

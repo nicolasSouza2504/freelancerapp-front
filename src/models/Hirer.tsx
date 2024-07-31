@@ -1,7 +1,7 @@
-export default interface Contratante {
-  id: number;
+export default interface Hirer {
+  id?: number;
   name: string;
   cpfCnpj: string;
   hexColor: string;
-  userLoginId: string;
+  userLoginId?: string;
 }

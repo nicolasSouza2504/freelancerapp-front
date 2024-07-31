@@ -4,6 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import ColorPicker, { Panel1, HueSlider } from 'reanimated-color-picker';
 import defaultStyle from '../../styles/DefaultStyles';
 import Hirer from '../../models/Hirer';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import ValidationContainer from '../../components/ValidationContainer';
+import HirerService from '../../services/HirerService';
+import ModalSuccessContainer from '../../components/ModalSuccess';
 
 interface HirerFormProps {
     hirer?: Hirer;
@@ -13,23 +17,122 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
 
     const [nome, setNome] = useState<string>(hirer?.name || '');
     const [cpfCnpj, setCpfCnpj] = useState<string>(hirer?.cpfCnpj || '');
-    const [cor, setCor] = useState<string>(hirer?.hexColor || '');
+    const [hexColor, setHexColor] = useState<string>(hirer?.hexColor || '');
     const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
+    const [maskCpfCnpj, setMaskCpfCnpj] = useState('99.999.999/9999-99');
+    const [validHirer, setValidHirer] = useState(true);
+    const [textError, setTextError] = useState('');
+    const [successMessageVisible, setSuccessMessageVisible] = useState(false);
 
     const navigation = useNavigation();
 
-    const handleSave = () => {
-        // Logic to save the data
-        console.log({ nome, cpfCnpj, cor });
-        // Navigate back or to another screen after saving
+    const handleSave = async () => {
+
+        const hirer: Hirer = { name: nome, cpfCnpj: cpfCnpj.replace(/\D/g, ''), hexColor: hexColor };
+
+        let validHirer = validateHirer(hirer);
+
+        if (validHirer) {
+
+            try {
+
+                const response = await HirerService.save(hirer);
+
+                if (response.status === 200) {
+                    setSuccessMessageVisible(true);
+                }
+
+            } catch (error) {
+
+                throwError(error.message);
+
+            }
+
+        }
+
     };
 
+    const handleCpfCnpjChange = (text: string) => {
+
+        setCpfCnpj(text);
+
+        const cleanValue = text.replace(/\D/g, '');
+        let maskedValue = '';
+
+        if (cleanValue.length <= 11) {
+            maskedValue = maskCpf(cleanValue);
+        } else if (cleanValue.length <= 14) {
+            maskedValue = maskCnpj(cleanValue)
+        } else {
+            maskedValue = maskCnpj(cleanValue.slice(0, 14));
+        }
+
+        setCpfCnpj(maskedValue);
+
+    };
+
+    const maskCnpj = (cnpj: string): string => {
+
+        return cnpj
+            .replace(/^(\d{2})(\d)/, '$1.$2')
+            .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+            .replace(/\.(\d{3})(\d)/, '.$1/$2')
+            .replace(/(\d{4})(\d)/, '$1-$2');
+
+    }
+
+    const maskCpf = (cpf: string): string => {
+
+        return cpf.replace(/^(\d{3})(\d)/, '$1.$2')
+            .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+            .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+
+    }
+
+    const validateHirer = (hirer: Hirer): boolean => {
+
+        if (!hirer.cpfCnpj) {
+
+            throwError('Informe o cnpj/cpf do contratante!');
+
+            return false;
+
+        }
+
+        if (!hirer.name) {
+
+            throwError('Informe o nome do contratante!')
+
+            return false;
+
+        }
+
+        if (!hirer.hexColor) {
+
+            throwError('Informe a cor do contratante para exibições do sistema!')
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+    const throwError = (errorMessage: string): void => {
+
+        setTextError(errorMessage);
+
+        setValidHirer(false);
+
+    }
+
     return (
-        <View style={defaultStyle.containerDefault}>
+        <SafeAreaView style={defaultStyle.containerDefault}>
             <TouchableOpacity onPress={() => { navigation.navigate('Menu' as never) }} style={defaultStyle.homeIcon}>
                 <Image source={require('../../images/menu/Menu.png')} style={defaultStyle.icon} />
             </TouchableOpacity>
-            <Text style={styles.title}>Inserir Contratantes</Text>
+            <Text style={styles.title}>Inserir Contratante</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Nome"
@@ -42,21 +145,21 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
                 placeholder="CPF/CNPJ"
                 placeholderTextColor="#000"
                 value={cpfCnpj}
-                onChangeText={setCpfCnpj}
+                onChangeText={handleCpfCnpjChange}
             />
             <View style={styles.colorPickerContainer}>
                 <Text style={styles.label}>Cor</Text>
-                <TouchableOpacity style={[styles.colorPreview, { backgroundColor: cor }]} onPress={() => setShowColorPicker(true)}>
+                <TouchableOpacity style={[styles.colorPreview, { backgroundColor: hexColor }]} onPress={() => setShowColorPicker(true)}>
                     <Text style={styles.colorPickerText}>✎</Text>
                 </TouchableOpacity>
             </View>
             {showColorPicker && (
                 <View style={styles.pickerWrapper}>
                     <ColorPicker
-                        value={cor}
+                        value={hexColor}
                         sliderThickness={20}
                         onComplete={(color) => {
-                            setCor(color.hex);
+                            setHexColor(color.hex);
                             setShowColorPicker(false);
                         }}
                         thumbSize={30}
@@ -66,10 +169,21 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
                     </ColorPicker>
                 </View>
             )}
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                <Text style={styles.saveButtonText}>Salvar</Text>
+            <TouchableOpacity style={defaultStyle.button} onPress={handleSave}>
+                <Text style={defaultStyle.buttonText}>Salvar</Text>
             </TouchableOpacity>
-        </View>
+            {!validHirer && (
+                <ValidationContainer message={textError}></ValidationContainer>
+            )}
+            {successMessageVisible && (
+                <ModalSuccessContainer setSuccessMessageVisible={setSuccessMessageVisible}
+                    successMessage={'Contratante salvo com sucesso!'}
+                    successMessageVisible={successMessageVisible}
+                    redirect={true}
+                    redirectPath={'Hirers'}
+                />
+            )}
+        </SafeAreaView>
     );
 };
 
@@ -117,13 +231,7 @@ const styles = StyleSheet.create({
     slider: {
         marginTop: 20,
         height: 40,
-    },
-    saveButton: {
-        ...defaultStyle.button,
-    },
-    saveButtonText: {
-        ...defaultStyle.buttonText,
-    },
+    }
 });
 
 export default HirerFormScreen;
