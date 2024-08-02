@@ -15,6 +15,7 @@ const ContratantesScreen: React.FC = () => {
   const [hirers, setHirers] = useState<Hirer[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const navigation = useNavigation();
+  const [refresh, setRefresh] = useState<boolean>(false);
 
   useFocusEffect(
 
@@ -22,7 +23,7 @@ const ContratantesScreen: React.FC = () => {
 
       fetchHirers();
 
-    }, [])
+    }, [refresh])
 
   );
 
@@ -63,6 +64,38 @@ const ContratantesScreen: React.FC = () => {
 
   }
 
+  const removeHirer = async () => {
+
+    let hirerToUpdate: Hirer | undefined = hirers.find(hirer => hirer.id === selectedId);
+
+    if (hirerToUpdate) {
+
+      try {
+
+        const response = await HirerService.remove(hirerToUpdate.id);
+
+        if (response.status === 200) {
+
+          ToastComponent.throwSuccess('Contratante excluído com sucesso!');
+
+          refreshGrid();
+
+        }
+
+      } catch (error) {
+        ToastComponent.throwError('Erro ao excluir contratante!');
+      }
+
+    } else {
+      ToastComponent.throwError('Selecione um contratante');
+    }
+
+    function refreshGrid(): void {
+      setRefresh(!refresh)
+    }
+
+  }
+
   return (
     <SafeAreaView style={defaultStyle.containerDefault}>
       <TouchableOpacity onPress={() => { navigation.navigate('Menu' as never) }} style={defaultStyle.homeIcon}>
@@ -73,7 +106,7 @@ const ContratantesScreen: React.FC = () => {
       <View style={defaultStyle.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('HirerForm' as never) }}><Text style={styles.buttonText}>Inserir</Text></TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={updateHirer}><Text style={styles.buttonText}>Editar</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Excluir</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={removeHirer}><Text style={styles.buttonText}>Excluir</Text></TouchableOpacity>
       </View>
       <View style={styles.gridContext}>
         <DataTable>

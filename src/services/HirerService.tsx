@@ -14,7 +14,7 @@ export default {
         return await ServiceApi.post('/hirer', hirer);
     },
 
-    remove: async (id: string): Promise<AxiosResponse> => {
+    remove: async (id: number | undefined): Promise<AxiosResponse> => {
         return await ServiceApi.delete('/hirer/' + id)
     }
 
