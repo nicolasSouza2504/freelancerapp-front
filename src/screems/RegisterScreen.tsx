@@ -2,88 +2,87 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import defaultStyle from '../styles/DefaultStyles';
 import User from '../models/User';
-import RegisterService from '../services/RegisterService'; 
-import ValidationContainer from '../components/ValidationContainer';
+import RegisterService from '../services/RegisterService';
+import ToastComponent from '../components/ToastComponent';
 import Response from '../models/Response';
 import { TextInputMask } from 'react-native-masked-text'
 import { AxiosResponse } from 'axios';
 import { useNavigation } from '@react-navigation/native';
-import ModalSuccess from '../components/ModalSuccess'
+import Toast from 'react-native-toast-message';
 
 const RegisterScreen: React.FC = () => {
 
   const [user, setUser] = useState<User>({ email: '', password: '' });
-  const [validRegister, setValidRegister] = useState(true);
-  const [textError, setTextError] = useState('');
-  const [successMessageVisible, setSuccessMessageVisible] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   const navigator = useNavigation();
 
   async function handleRegister() {
-    
+
     let validUser = validateUser();
 
     if (validUser) {
 
       try {
-        
+
         const response: AxiosResponse<User> = await RegisterService.register(user);
-                
+
         if (response.data.id) {
-          setSuccessMessage('Usuário cadastrado com sucesso! Agora você pode realizar o login no aplicativo!');
-          setSuccessMessageVisible(true);
+
+          ToastComponent.throwSuccess('Usuário cadastrado com sucesso!');
+
+          setTimeout(() => {
+            navigator.navigate('Login' as never);
+          }, 1000);
+
         }
 
-      } catch(error) {
-          
+      } catch (error) {
+
         let responses: Response[] = error.response.data;
-        
+
         if (responses.length > 1) {
-          
+
           let concatenedMessages: string = responses.map((resp) => resp.message).join('; ');
 
-          throwErrorScreen(concatenedMessages);
+          ToastComponent.throwError(concatenedMessages);
 
         } else {
-          throwErrorScreen(responses[0].message);
-        }      
+          ToastComponent.throwError(responses[0].message);
+        }
 
       }
 
     }
-  
+
   }
 
   function validateUser(): boolean {
-     
-    if (!user.email || !validEmail(user.email)) {    
-      
-      throwErrorScreen('Informe um e-mail válido!');
-      
+
+    if (!user.email || !validEmail(user.email)) {
+
+      ToastComponent.throwError('Informe um e-mail válido!');
+
       return false;
 
-    } else if(!user.password) {            
-      
-      throwErrorScreen('Informe uma senha válida!');
-      
+    } else if (!user.password) {
+
+      ToastComponent.throwError('Informe uma senha válida!');
+
       return false;
 
     } else if (!user.confirmedPassword) {
 
-      throwErrorScreen('Confirme a senha!');
-      
+      ToastComponent.throwError('Confirme a senha!');
+
       return false;
 
     } else if (user.confirmedPassword !== user.password) {
 
-      throwErrorScreen('As senhas divergem!');
-      
+      ToastComponent.throwError('As senhas divergem!');
+
       return false;
 
     }
-
-    setValidRegister(true)
 
     return true;
 
@@ -91,14 +90,6 @@ const RegisterScreen: React.FC = () => {
 
   function validEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function throwErrorScreen(message: string) {
-
-    setTextError(message);
-  
-    setValidRegister(false);
-
   }
 
   return (
@@ -112,19 +103,7 @@ const RegisterScreen: React.FC = () => {
       <TouchableOpacity style={defaultStyle.button} onPress={handleRegister}>
         <Text style={defaultStyle.buttonText}>Criar Nova Conta</Text>
       </TouchableOpacity>
-      {!validRegister && (
-        <ValidationContainer message={textError}></ValidationContainer>
-      )}
-      {successMessageVisible && (
-        <ModalSuccess   setSuccessMessageVisible={setSuccessMessageVisible} 
-                        successMessage={successMessage}
-                        successMessageVisible={successMessageVisible}
-                        redirect={true}
-                        redirectPath={'Login'}
-                        >
-
-       </ModalSuccess>
-       )}
+      <Toast />
     </View>
   );
 };

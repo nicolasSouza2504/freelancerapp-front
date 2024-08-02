@@ -5,30 +5,34 @@ import ColorPicker, { Panel1, HueSlider } from 'reanimated-color-picker';
 import defaultStyle from '../../styles/DefaultStyles';
 import Hirer from '../../models/Hirer';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ValidationContainer from '../../components/ValidationContainer';
 import HirerService from '../../services/HirerService';
-import ModalSuccessContainer from '../../components/ModalSuccess';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+import ToastComponent from '../../components/ToastComponent';
 
-interface HirerFormProps {
-    hirer?: Hirer;
-}
+type RootStackParamList = {
+    HirerForm: { hirer: Hirer };
+};
 
-const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
+type HirerFormScreenRouteProp = RouteProp<RootStackParamList, 'HirerForm'>;
 
-    const [nome, setNome] = useState<string>(hirer?.name || '');
-    const [cpfCnpj, setCpfCnpj] = useState<string>(hirer?.cpfCnpj || '');
-    const [hexColor, setHexColor] = useState<string>(hirer?.hexColor || '');
+const HirerFormScreen: React.FC = () => {
+
+    const route = useRoute<HirerFormScreenRouteProp>();
+
+    const hirer: Hirer | null = route.params ? route.params.hirer : null;
+
+    const [editableHirer, setEditableHirer] = useState<Hirer>(hirer ? { ...hirer } : { name: '', cpfCnpj: '', hexColor: '' });
+    const [nome, setNome] = useState<string>(editableHirer?.name || '');
+    const [cpfCnpj, setCpfCnpj] = useState<string>(editableHirer?.cpfCnpj || '');
+    const [hexColor, setHexColor] = useState<string>(editableHirer?.hexColor || '');
     const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
-    const [maskCpfCnpj, setMaskCpfCnpj] = useState('99.999.999/9999-99');
-    const [validHirer, setValidHirer] = useState(true);
-    const [textError, setTextError] = useState('');
-    const [successMessageVisible, setSuccessMessageVisible] = useState(false);
 
     const navigation = useNavigation();
 
     const handleSave = async () => {
 
-        const hirer: Hirer = { name: nome, cpfCnpj: cpfCnpj.replace(/\D/g, ''), hexColor: hexColor };
+        const hirer: Hirer = { name: nome, cpfCnpj: cpfCnpj.replace(/\D/g, ''), hexColor: hexColor, id: editableHirer.id, userLoginId: editableHirer.userLoginId };
 
         let validHirer = validateHirer(hirer);
 
@@ -39,13 +43,17 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
                 const response = await HirerService.save(hirer);
 
                 if (response.status === 200) {
-                    setSuccessMessageVisible(true);
+
+                    ToastComponent.throwSuccess('Contratante Salvo com sucesso!');
+
+                    setTimeout(() => {
+                        navigation.navigate('Hirers' as never);
+                    }, 1000);
+
                 }
 
             } catch (error) {
-
-                throwError(error.message);
-
+                ToastComponent.throwError(error.message);
             }
 
         }
@@ -57,6 +65,7 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
         setCpfCnpj(text);
 
         const cleanValue = text.replace(/\D/g, '');
+
         let maskedValue = '';
 
         if (cleanValue.length <= 11) {
@@ -93,7 +102,7 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
 
         if (!hirer.cpfCnpj) {
 
-            throwError('Informe o cnpj/cpf do contratante!');
+            ToastComponent.throwError('Informe o cnpj/cpf do contratante!');
 
             return false;
 
@@ -101,7 +110,7 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
 
         if (!hirer.name) {
 
-            throwError('Informe o nome do contratante!')
+            ToastComponent.throwError('Informe o nome do contratante!')
 
             return false;
 
@@ -109,7 +118,7 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
 
         if (!hirer.hexColor) {
 
-            throwError('Informe a cor do contratante para exibições do sistema!')
+            ToastComponent.throwError('Informe a cor do contratante!')
 
             return false;
 
@@ -119,19 +128,12 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
 
     }
 
-    const throwError = (errorMessage: string): void => {
-
-        setTextError(errorMessage);
-
-        setValidHirer(false);
-
-    }
-
     return (
         <SafeAreaView style={defaultStyle.containerDefault}>
             <TouchableOpacity onPress={() => { navigation.navigate('Menu' as never) }} style={defaultStyle.homeIcon}>
                 <Image source={require('../../images/menu/Menu.png')} style={defaultStyle.icon} />
             </TouchableOpacity>
+            <Toast />
             <Text style={styles.title}>Inserir Contratante</Text>
             <TextInput
                 style={styles.input}
@@ -172,17 +174,6 @@ const HirerFormScreen: React.FC<HirerFormProps> = ({ hirer }) => {
             <TouchableOpacity style={defaultStyle.button} onPress={handleSave}>
                 <Text style={defaultStyle.buttonText}>Salvar</Text>
             </TouchableOpacity>
-            {!validHirer && (
-                <ValidationContainer message={textError}></ValidationContainer>
-            )}
-            {successMessageVisible && (
-                <ModalSuccessContainer setSuccessMessageVisible={setSuccessMessageVisible}
-                    successMessage={'Contratante salvo com sucesso!'}
-                    successMessageVisible={successMessageVisible}
-                    redirect={true}
-                    redirectPath={'Hirers'}
-                />
-            )}
         </SafeAreaView>
     );
 };
