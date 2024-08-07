@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button, SafeAreaVie
 import { addDays } from 'date-fns';
 import defaultStyle from '../../styles/DefaultStyles';
 
-
+//TODO FILTRO NÃO PRECISA DE HORA
 
 interface Work {
     startDate: string;
