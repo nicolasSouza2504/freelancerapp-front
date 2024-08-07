@@ -7,18 +7,20 @@ import RegisterScreen from './RegisterScreen';
 import MenuScreen from './MenuScreen';
 import HirerScreen from './Hirer/HirerScreen';
 import HirerFormScreen from './Hirer/HirerFormScreen';
+import WorkScreen from './Work/WorkScreen';
 
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Menu">
         <Stack.Screen options={{ headerShown: false }} name="Login" component={LoginScreen} />
         <Stack.Screen options={{ headerShown: false }} name="Register" component={RegisterScreen} />
         <Stack.Screen options={{ headerShown: false }} name="Menu" component={MenuScreen} />
         <Stack.Screen options={{ headerShown: false }} name="Hirers" component={HirerScreen} />
         <Stack.Screen options={{ headerShown: false }} name="HirerForm" component={HirerFormScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="WorkScreen" component={WorkScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

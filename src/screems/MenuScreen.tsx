@@ -15,7 +15,7 @@ const MenuScreen: React.FC = () => {
     <View style={defaultStyle.containerDefault}>
       <Text style={defaultStyle.title}>Menu</Text>
       <View style={styles.menuContainer}>
-        <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigation('Trabalhos')}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigation('WorkScreen')}>
           <Image source={require('../images/Trabalhos.png')} style={styles.icon} />
           <Text style={defaultStyle.buttonText}>Trabalhos</Text>
         </TouchableOpacity>
